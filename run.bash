@@ -12,12 +12,12 @@ sbcl --noinform --load sync.lisp --eval '(sync)' --quit
 
 echo ''
 echo 'Asynchronous Versions'
-# echo ''
-# echo "Javascript"
-# node async.js
+echo ''
+echo "Javascript"
+node async.js
 # echo ''
 # echo "Python"
 # python async.py
 echo ''
 echo "Common Lisp"
-sbcl --noinform --load async.lisp --eval '(async)' --quit
+sbcl --noinform --load async.lisp --eval '(progn (async1) (async2))' --quit

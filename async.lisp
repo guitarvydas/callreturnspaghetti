@@ -76,11 +76,20 @@
         (setf (component-list self) clist)
         clist)))) ;; return the list of components
 
-(defun async ()
+(defun async1 ()
   (let ((dsptchr (make-instance 'Dispatcher)))
     (let ((component-list (initialize dsptchr)))
       (enqueue (first component-list) "q")
       (enqueue (second component-list) "q")
+      (loop 
+       until (nothing-to-do dsptchr)
+       do    (exec dsptchr)))))
+
+(defun async2 ()
+  (let ((dsptchr (make-instance 'Dispatcher)))
+    (let ((component-list (initialize dsptchr)))
+      (enqueue (second component-list) "q")
+      (enqueue (first component-list) "q")
       (loop 
        until (nothing-to-do dsptchr)
        do    (exec dsptchr)))))

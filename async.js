@@ -54,9 +54,9 @@ function C (x) {
 
 function B (x) {
     if (x === "q") {
-	C ("s");
+	this.connected_to.send ("s");
     } else if (x === "r") {
-	C ("t");
+	this.connected_to.send ("t");
     } else {
 	fatalError ();
     }
@@ -109,7 +109,7 @@ class Dispatcher {
     }
 }
 
-function fasync () {
+function fasync1 () {
     let dsptchr = new Dispatcher ();
     dsptchr.initialize ();
     let componentB = dsptchr.get_B ();
@@ -121,4 +121,17 @@ function fasync () {
     }
 }
 
-fasync ();
+function fasync2 () {
+    let dsptchr = new Dispatcher ();
+    dsptchr.initialize ();
+    let componentB = dsptchr.get_B ();
+    let componentC = dsptchr.get_C ();
+    componentC.enqueue ("q");
+    componentB.enqueue ("q");
+    while (!dsptchr.nothing_to_do ()) {
+	dsptchr.exec ();
+    }
+}
+
+fasync1 ();
+fasync2 ();
