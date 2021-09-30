@@ -8,14 +8,15 @@ def fatalError ():
 
 
 class component:
-    def __init__ (self):
-        self.inqueue = queue.SimpleQueue ()
+    def __init__ (self, name):
+        self.inqueue = queue.LifoQueue ()
+        self.name = name
 
     def enqueue (self, data):
         self.inqueue.put (data)
 
     def dequeue (self):
-        self.inqueue.get ()
+        return self.inqueue.get ()
         
     def empty_queue (self):
         print ("empty_queue")
@@ -25,12 +26,14 @@ class component:
     def exec_once (self):
         print ("exec once")
         data = self.dequeue ()
+        print (data)
         self.func (data)
 
     def send (self, data):
         self.connected_to.enqueue (data)
 
 def C (x):
+    print ("C")
     if (x == "q"):
         output ("v")
     elif (x == "r"):
@@ -45,6 +48,7 @@ def C (x):
         fatalError ()
 
 def B (x):
+    print ("B")
     if (x == "q"):
         self.send ("s")
     elif (x == "r"):
@@ -53,28 +57,30 @@ def B (x):
         fatalError ()
 
 def make_B (target):
-    comp = component ()
+    comp = component ("B")
     comp.connected_to = target
     comp.func = B
     return comp
 
 
 def make_C ():
-    comp = component ()
+    comp = component ("C")
     comp.func = C
     return comp
 
 class Dispatcher:
     def __init__ (self):
-        self.component_list = queue.LifoQueue ()
+        self.component_list = queue.SimpleQueue ()
 
     def exec (self):
-        print ("disp exec 0")
-        q = self.component_list
-        while (not q.empty ()):
-            print ("disp exec 1")
-            cmponent = q.get ();
-            if (not cmponent.empty_queue):
+        componentlis = self.component_list
+        print ("disp.exec " + str (self.component_list.qsize ()) + " " + str (componentlis.qsize ()))
+        while (not componentlis.empty ()):
+            cmponent = componentlis.get ()
+            print ("disp exec 1 " + cmponent.name)
+            print (cmponent.inqueue.qsize ())
+            if (not cmponent.empty_queue () ):
+                print ("disp exec 2 " + cmponent.name)
                 cmponent.exec_once ()
 
     def nothing_to_do (self):
@@ -90,8 +96,12 @@ class Dispatcher:
         Component1 = make_B (Component2);
         self.cB = Component2
         self.cC = Component1
-        self.component_list.put (Component1);
-        self.component_list.put (Component2);
+        print ("disp.initialize size=" + str (self.component_list.qsize ()))
+        self.component_list.put (Component1)
+        print ("disp.initialize size=" + str (self.component_list.qsize ()))
+        self.component_list.put (Component2)
+        print ("disp.initialize size=" + str (self.component_list.qsize ()))
+        print ("disp.initialize " + str (self.component_list.qsize ()));
 
     def get_B (self):
         return self.cB
