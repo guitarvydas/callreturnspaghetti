@@ -1,4 +1,5 @@
-import queue
+# unfnished attempt at casting async.js into python
+# 
 
 def output (s):
     print (s)
@@ -9,31 +10,26 @@ def fatalError ():
 
 class component:
     def __init__ (self, name):
-        self.inqueue = queue.LifoQueue ()
+        self.inqueue = LifoQueue ()
         self.name = name
 
     def enqueue (self, data):
-        self.inqueue.put (data)
+        self.inqueue.enqueue_to_end (data)
 
     def dequeue (self):
-        return self.inqueue.get ()
+        return self.inqueue.pop_from_front ()
         
     def empty_queue (self):
-        print ("empty_queue")
-        print (self.inqueue.empty ())
         return self.inqueue.empty ()
  
     def exec_once (self):
-        print ("exec once")
         data = self.dequeue ()
-        print (data)
         self.func (data)
 
     def send (self, data):
         self.connected_to.enqueue (data)
 
 def C (x):
-    print ("C")
     if (x == "q"):
         output ("v")
     elif (x == "r"):
@@ -48,7 +44,6 @@ def C (x):
         fatalError ()
 
 def B (x):
-    print ("B")
     if (x == "q"):
         self.send ("s")
     elif (x == "r"):
@@ -70,23 +65,19 @@ def make_C ():
 
 class Dispatcher:
     def __init__ (self):
-        self.component_list = queue.SimpleQueue ()
+        self.component_list = List ()
 
     def exec (self):
         componentlis = self.component_list
-        print ("disp.exec " + str (self.component_list.qsize ()) + " " + str (componentlis.qsize ()))
         while (not componentlis.empty ()):
-            cmponent = componentlis.get ()
-            print ("disp exec 1 " + cmponent.name)
-            print (cmponent.inqueue.qsize ())
+            cmponent = componentlis.next ()
             if (not cmponent.empty_queue () ):
-                print ("disp exec 2 " + cmponent.name)
                 cmponent.exec_once ()
 
     def nothing_to_do (self):
-        q = self.component_list
-        while (not q.empty ()):
-            c = q.get ();
+        lis = self.component_list
+        while (not lis.empty ()):
+            c = lis.next ();
             if (not c.empty_queue ()):
                 return False
         return True
@@ -96,12 +87,8 @@ class Dispatcher:
         Component1 = make_B (Component2);
         self.cB = Component2
         self.cC = Component1
-        print ("disp.initialize size=" + str (self.component_list.qsize ()))
         self.component_list.put (Component1)
-        print ("disp.initialize size=" + str (self.component_list.qsize ()))
         self.component_list.put (Component2)
-        print ("disp.initialize size=" + str (self.component_list.qsize ()))
-        print ("disp.initialize " + str (self.component_list.qsize ()));
 
     def get_B (self):
         return self.cB
